@@ -1,7 +1,29 @@
 <script setup lang="ts">
 import Versions from './components/Versions.vue'
 
-const ipcHandle = () => window.electron.ipcRenderer.send('ping')
+const ipcHandle = async () => {
+  window.electron.ipcRenderer.send('ping', 'ping-message')
+
+  // innvoke
+  const invokeReplyMessage = await window.electron.ipcRenderer.invoke('invoke', 'invoke_data')
+  console.log('invokeReplyMessage:', invokeReplyMessage)
+
+  const sendSyncReplyMessage = await window.electron.ipcRenderer.sendSync(
+    'sendSync',
+    'sendReplay_data'
+  )
+  console.log('sendSyncReplyMessage:', sendSyncReplyMessage)
+}
+
+//  event.reply('reply', 'main_data')
+window.electron.ipcRenderer.on('reply', (event, message) => {
+  console.log('replayEvent', event)
+  console.log('replyMessage', message)
+})
+
+window.electron.ipcRenderer.on('messageToRenderer', (event, message) => {
+  console.log('messageToRenderer:', event, message)
+})
 </script>
 
 <template>

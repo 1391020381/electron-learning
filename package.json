@@ -1,7 +1,7 @@
 {
   "name": "electron-learning",
   "version": "1.0.0",
-  "productName":"爱问共享资料",
+  "productName": "爱问共享资料",
   "description": "An Electron application with Vue and TypeScript",
   "main": "./out/main/index.js",
   "author": "example.com",
@@ -24,6 +24,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
+    "electron-drag": "^2.0.0",
     "electron-updater": "^6.1.7"
   },
   "devDependencies": {

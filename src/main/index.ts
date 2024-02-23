@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, Notification } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -10,15 +10,20 @@ function createWindow(): void {
     height: 670,
     show: false,
     autoHideMenuBar: true,
+    frame: false,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }
   })
-
+  const notify = new Notification({
+    title: '标题',
+    body: '这是内容！！！！'
+  })
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+    notify.show()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -51,8 +56,25 @@ app.whenReady().then(() => {
   })
 
   // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  ipcMain.on('ping', (event, message) => {
+    console.log(event, message)
+    event.reply('reply', 'main_data')
+  })
+  // invoke
+  ipcMain.handle('invoke', async (evnet, message) => {
+    console.log(`receive message from render: ${message}`)
+    return 'invokeReplay'
+  })
+  //
+  ipcMain.on('sendSync', async (event, message) => {
+    console.log(`receive message from render: ${message}`)
+    event.sender.send('messageToRenderer', 'Hello from Main!')
+    event.returnValue = 'replay'
+  })
 
+  ipcMain.on('messageFromMain', (event, arg) => {
+    event.sender.send('messageToRenderer', 'Hello from Main!', arg)
+  })
   createWindow()
 
   app.on('activate', function () {
